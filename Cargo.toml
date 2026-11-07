@@ -1,0 +1,10 @@
+[package]
+name = "flash_firmware"
+version = "0.1.0"
+edition = "2024"
+
+
+[dependencies]
+espflash = { version = "4.7.0", default-features = false, features = ["serialport"] }
+serialport = { version = "4.10.1", default-features = false }
+rpi-pal = "0.22.3"
