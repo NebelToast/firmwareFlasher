@@ -42,3 +42,9 @@ impl GpioSetup {
         self.reset();
     }
 }
+
+impl Drop for GpioSetup {
+    fn drop(&mut self) {
+        self.flash_pin.set_high();
+    }
+}
