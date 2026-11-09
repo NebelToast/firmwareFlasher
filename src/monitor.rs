@@ -19,26 +19,23 @@ impl SerialMonitor {
         let port = serialport::new(port_name, baud_rate)
             .timeout(Duration::from_millis(200))
             .open_native()
-            .unwrap();
+            .expect("Couldn't get Serialport");
 
         let stdout = io::stdout();
         let buf = [0u8; 1024];
         Self { port, stdout, buf }
     }
 
-    pub fn serial_loop(mut self) {
+    pub fn serial_loop(mut self) -> Result<(), Box<dyn std::error::Error>> {
         loop {
             match self.port.read(&mut self.buf) {
                 Ok(n) if n > 0 => {
-                    self.stdout.write_all(&self.buf[..n]).unwrap();
-                    self.stdout.flush().unwrap();
+                    self.stdout.write_all(&self.buf[..n])?;
+                    self.stdout.flush()?;
                 }
                 Ok(_) => {}
                 Err(ref e) if e.kind() == io::ErrorKind::TimedOut => {}
-                Err(e) => {
-                    eprintln!("Error: {e}");
-                    break;
-                }
+                Err(e) => return Err(e.into()),
             }
         }
     }

@@ -10,18 +10,10 @@ pub struct FirmwareFlasher {
     flasher: Flasher,
 }
 
-
 impl FirmwareFlasher {
     pub fn new(connection: Connection) -> Self {
-        let flasher = Flasher::connect(
-            connection,
-            true,
-            true,
-            false,
-            None,
-            Some(460_800),
-        )
-        .unwrap();
+        let flasher = Flasher::connect(connection, true, true, false, None, Some(460_800))
+            .expect("Connection struct was invalid");
         Self { flasher }
     }
 
@@ -29,7 +21,7 @@ impl FirmwareFlasher {
         let serial = serialport::new(port_path, 115_200)
             .timeout(Duration::from_secs(3))
             .open_native()
-            .unwrap();
+            .expect("Port isn't valid");
 
         let dummy_port_info = UsbPortInfo {
             vid: 0,
@@ -50,19 +42,15 @@ impl FirmwareFlasher {
         Self::new(connection)
     }
 
-   
-
-
-
-    pub fn flash_firmware(mut self, addr: u32, data: &[u8]) {
-        println!(
-            "Writinh {} Bytes to adress {:#x}",
-            data.len(),
-            addr
-        );
+    pub fn flash_firmware(
+        mut self,
+        addr: u32,
+        data: &[u8],
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        println!("Writinh {} Bytes to adress {:#x}", data.len(), addr);
         self.flasher
-            .write_bin_to_flash(addr, data, &mut DefaultProgressCallback)
-            .unwrap();
+            .write_bin_to_flash(addr, data, &mut DefaultProgressCallback)?;
         println!("Flash worked");
+        Ok(())
     }
 }

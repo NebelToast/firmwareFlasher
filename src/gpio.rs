@@ -9,9 +9,15 @@ pub struct GpioSetup {
 
 impl GpioSetup {
     pub fn new(reset_pin_number: u8, flash_pin_number: u8) -> Self {
-        let gpio = Gpio::new().unwrap();
-        let reset_pin = gpio.get(reset_pin_number).unwrap().into_output();
-        let flash_pin = gpio.get(flash_pin_number).unwrap().into_output();
+        let gpio = Gpio::new().expect("Couldn't create Gpio");
+        let reset_pin = gpio
+            .get(reset_pin_number)
+            .expect("Couldn't get pin")
+            .into_output();
+        let flash_pin = gpio
+            .get(flash_pin_number)
+            .expect("Couldn't get pin")
+            .into_output();
         Self {
             reset_pin,
             flash_pin,
@@ -35,6 +41,4 @@ impl GpioSetup {
         self.flash_pin.set_high();
         self.reset();
     }
-
-    
 }
